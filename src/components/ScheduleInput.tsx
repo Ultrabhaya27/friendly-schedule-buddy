@@ -24,6 +24,18 @@ const ScheduleInput = () => {
       // In a real app, this would call your AI service
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // For now, we're just simulating saving the appointment
+      // In a real app, this would be handled by your backend
+      const appointment = {
+        id: Date.now().toString(),
+        title: input,
+        time: new Date().toLocaleTimeString(),
+        date: new Date().toISOString().split('T')[0],
+      };
+
+      // In a real app, you would save this to your backend
+      console.log('New appointment:', appointment);
+      
       toast({
         title: "Schedule Updated",
         description: "Your appointment has been scheduled successfully!",

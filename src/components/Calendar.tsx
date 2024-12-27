@@ -3,9 +3,21 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+interface Appointment {
+  id: string;
+  title: string;
+  time: string;
+}
+
 const Calendar = () => {
   const [currentDate, setCurrentDate] = React.useState(new Date());
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
+  const [appointments, setAppointments] = React.useState<Record<string, Appointment[]>>({
+    '2024-03-27': [
+      { id: '1', title: 'Doctor Appointment', time: '10:00 AM' },
+      { id: '2', title: 'Team Meeting', time: '2:00 PM' },
+    ],
+  });
 
   const daysInMonth = new Date(
     currentDate.getFullYear(),
@@ -28,15 +40,21 @@ const Calendar = () => {
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+    setSelectedDate(null);
   };
 
   const handleNextMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+    setSelectedDate(null);
+  };
+
+  const formatDate = (date: Date) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   };
 
   const handleDateClick = (day: number) => {
     const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    setSelectedDate(newDate);
+    setSelectedDate(prev => prev?.getTime() === newDate.getTime() ? null : newDate);
   };
 
   const renderCalendarDays = () => {
@@ -46,6 +64,10 @@ const Calendar = () => {
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
+      const currentDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+      const dateKey = formatDate(currentDay);
+      const hasAppointments = appointments[dateKey]?.length > 0;
+      
       const isSelected = selectedDate?.getDate() === day &&
         selectedDate?.getMonth() === currentDate.getMonth() &&
         selectedDate?.getFullYear() === currentDate.getFullYear();
@@ -55,19 +77,36 @@ const Calendar = () => {
         new Date().getFullYear() === currentDate.getFullYear();
 
       days.push(
-        <button
-          key={day}
-          onClick={() => handleDateClick(day)}
-          className={`h-12 rounded-lg transition-all duration-200 hover:bg-secondary ${
-            isSelected
-              ? 'bg-primary text-primary-foreground'
-              : isToday
-              ? 'bg-accent text-accent-foreground'
-              : ''
-          }`}
-        >
-          {day}
-        </button>
+        <div key={day} className="relative">
+          <button
+            onClick={() => handleDateClick(day)}
+            className={`h-12 w-full rounded-lg transition-all duration-200 hover:bg-secondary relative ${
+              isSelected
+                ? 'bg-primary text-primary-foreground'
+                : isToday
+                ? 'bg-accent text-accent-foreground'
+                : ''
+            }`}
+          >
+            <span>{day}</span>
+            {hasAppointments && (
+              <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full" />
+            )}
+          </button>
+          {isSelected && appointments[dateKey] && (
+            <div className="absolute z-10 left-0 right-0 mt-2 bg-card rounded-lg shadow-lg p-3 animate-fade-in">
+              <h4 className="text-sm font-medium mb-2">Appointments</h4>
+              <div className="space-y-2">
+                {appointments[dateKey].map((apt) => (
+                  <div key={apt.id} className="text-sm p-2 bg-accent rounded">
+                    <p className="font-medium">{apt.title}</p>
+                    <p className="text-muted-foreground">{apt.time}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       );
     }
     return days;
