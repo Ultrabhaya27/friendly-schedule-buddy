@@ -9,26 +9,29 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Calendar, Settings, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const items = [
   {
     title: "Calendar",
     icon: Calendar,
-    url: "#",
+    path: "/calendar",
   },
   {
     title: "Profile",
     icon: User,
-    url: "#",
+    path: "/profile",
   },
   {
     title: "Settings",
     icon: Settings,
-    url: "#",
+    path: "/settings",
   },
 ];
 
 export function AppSidebar() {
+  const navigate = useNavigate();
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -38,11 +41,12 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </a>
+                  <SidebarMenuButton
+                    onClick={() => navigate(item.path)}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

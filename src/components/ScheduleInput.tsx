@@ -10,7 +10,7 @@ const ScheduleInput = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -19,9 +19,26 @@ const ScheduleInput = () => {
       description: "We're analyzing your scheduling request...",
     });
 
-    // Here we'll later integrate with the AI API
-    setInput('');
-    setIsExpanded(false);
+    try {
+      // Here we simulate processing the scheduling request
+      // In a real app, this would call your AI service
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Schedule Updated",
+        description: "Your appointment has been scheduled successfully!",
+      });
+
+      // Clear input and collapse
+      setInput('');
+      setIsExpanded(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to process your scheduling request. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
